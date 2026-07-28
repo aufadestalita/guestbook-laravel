@@ -4,251 +4,266 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Buku Tamu KSOP Banten</title>
-   
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-   
+    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans antialiased text-slate-800">
+<body class="min-h-screen bg-slate-950 text-slate-100 bg-cover bg-center bg-fixed antialiased"
+    style="background-image: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=1920');">
 
-   
-    <nav class="bg-slate-900 text-white shadow-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+    <!-- Background Overlay Dark Glass -->
+    <div class="min-h-screen w-full bg-slate-950/80 backdrop-brightness-75 pb-16">
+
+        <!-- NAVBAR UTAMA -->
+        <nav class="w-full bg-slate-900/80 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-3.5 shadow-2xl sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-ship text-2xl text-blue-400"></i>
-                    <span class="font-bold text-lg tracking-wide">KSOP BANTEN - ADMIN PANEL</span>
+                    <div class="p-2 bg-blue-500/20 border border-blue-400/30 rounded-xl text-cyan-400">
+                        <i class="fa-solid fa-ship text-xl"></i>
+                    </div>
+                    <span class="font-bold text-base sm:text-lg tracking-wider text-white">KSOP BANTEN <span class="text-cyan-400 font-normal">| ADMIN PANEL</span></span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-slate-300">Halo, <strong class="text-white">{{ Auth::user()->name ?? 'Admin' }}</strong></span>
+                    <span class="text-xs sm:text-sm text-slate-300 hidden sm:inline">Halo, <strong class="text-white font-semibold">{{ Auth::user()->name ?? 'Admin' }}</strong></span>
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition duration-200">
-                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+                        <button type="submit" class="bg-red-600/80 hover:bg-red-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-white/20 transition flex items-center shadow-lg gap-1.5">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-  
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- CONTAINER CONTENT -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
 
-        
-        @if(session('success'))
-            <div class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded-r-lg shadow-sm flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-circle-check text-xl text-emerald-600"></i>
-                    <span>{{ session('success') }}</span>
+            <!-- FLASH SESSION SUCCESS ALERT -->
+            @if(session('success'))
+                <div class="p-4 bg-emerald-950/80 border-l-4 border-emerald-400 border-y border-r border-emerald-500/30 text-emerald-200 rounded-r-2xl backdrop-blur-xl shadow-xl flex items-center justify-between animate-fade-in">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-circle-check text-2xl text-emerald-400"></i>
+                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-white font-bold text-xl px-2">&times;</button>
                 </div>
-                <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 font-bold">&times;</button>
-            </div>
-        @endif
+            @endif
 
-       
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">Data Kunjungan Buku Tamu</h1>
-                <p class="text-sm text-slate-500">Kelola dan pantau seluruh riwayat tamu di KSOP Banten.</p>
-            </div>
-            <div class="flex items-center space-x-3">
-                
-                <button onclick="openModal('modalTambah')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-sm flex items-center space-x-2 transition">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>+ Tambah Tamu</span>
-                </button>
-                
-                <a href="{{ route('laporan.exportPdf', request()->query()) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-sm flex items-center space-x-2 transition">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    <span>Ekspor PDF</span>
-                </a>
-            </div>
-        </div>
-
-       
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
-                    <i class="fa-solid fa-users text-2xl"></i>
-                </div>
+            <!-- PAGE HEADER & ACTION BUTTONS -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Total Tamu (Filter)</p>
-                    <p class="text-2xl font-bold text-slate-900">{{ $tamus->count() }} Orang</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-wide drop-shadow-md">Data Kunjungan Buku Tamu</h1>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Kelola dan pantau seluruh riwayat tamu di KSOP Banten secara real-time.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openModal('modalTambah')" class="bg-blue-600/90 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-lg border border-white/20 flex items-center space-x-2 transition hover:scale-105">
+                        <i class="fa-solid fa-user-plus text-cyan-300"></i>
+                        <span>Tambah Tamu</span>
+                    </button>
+                    <a href="{{ route('laporan.exportPdf', request()->query()) }}" class="bg-red-600/90 hover:bg-red-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-lg border border-white/20 flex items-center space-x-2 transition hover:scale-105">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Ekspor PDF</span>
+                    </a>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
-                    <i class="fa-solid fa-filter text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Status Filter</p>
-                    <p class="text-base font-semibold text-slate-800 capitalize">{{ $filterType }}</p>
-                </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg">
-                    <i class="fa-solid fa-calendar-day text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Hari Ini</p>
-                    <p class="text-base font-semibold text-slate-800">{{ now()->translatedFormat('d F Y') }}</p>
-                </div>
-            </div>
-        </div>
 
-        
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
-            <form action="{{ route('dashboard') }}" method="GET" class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-              
-                <div class="flex flex-wrap items-end gap-3 flex-1">
+            <!-- CARDS STATISTIK (GLASSMORPISM) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="bg-slate-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-4">
+                    <div class="p-3.5 bg-blue-500/20 text-cyan-400 rounded-xl border border-cyan-400/30">
+                        <i class="fa-solid fa-users text-2xl"></i>
+                    </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe Filter</label>
-                        <select name="filter_type" id="filter_type" onchange="switchFilterView(this.value)" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-slate-50">
-                            <option value="semua" {{ $filterType == 'semua' ? 'selected' : '' }}>Semua Data</option>
-                            <option value="hari" {{ $filterType == 'hari' ? 'selected' : '' }}>Harian</option>
-                            <option value="minggu" {{ $filterType == 'minggu' ? 'selected' : '' }}>Mingguan</option>
-                            <option value="bulanan" {{ $filterType == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
-                        </select>
+                        <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Total Tamu (Filter)</p>
+                        <p class="text-2xl font-bold text-white mt-0.5">{{ $tamus->count() }} Orang</p>
                     </div>
-
-                    <!-- Input Filter Harian -->
-                    <div id="filter_hari_group" class="filter-input-group {{ $filterType == 'hari' ? '' : 'hidden' }}">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Tanggal</label>
-                        <input type="date" name="tanggal" value="{{ request('tanggal', date('Y-m-d')) }}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="bg-slate-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-4">
+                    <div class="p-3.5 bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-400/30">
+                        <i class="fa-solid fa-filter text-2xl"></i>
                     </div>
-
-                    <!-- Input Filter Mingguan -->
-                    <div id="filter_minggu_group" class="filter-input-group flex items-center gap-2 {{ $filterType == 'minggu' ? '' : 'hidden' }}">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Dari Tanggal</label>
-                            <input type="date" name="tgl_mulai" value="{{ request('tgl_mulai', now()->startOfWeek()->format('Y-m-d')) }}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                        </div>
-                        <span class="text-xs text-slate-400 self-end mb-2">s/d</span>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Sampai Tanggal</label>
-                            <input type="date" name="tgl_selesai" value="{{ request('tgl_selesai', now()->endOfWeek()->format('Y-m-d')) }}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                        </div>
+                    <div>
+                        <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Status Filter</p>
+                        <p class="text-base font-semibold text-emerald-300 capitalize mt-0.5">{{ $filterType }}</p>
                     </div>
+                </div>
+                <div class="bg-slate-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-4">
+                    <div class="p-3.5 bg-purple-500/20 text-purple-300 rounded-xl border border-purple-400/30">
+                        <i class="fa-solid fa-calendar-day text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Hari Ini</p>
+                        <p class="text-base font-semibold text-purple-200 mt-0.5">{{ now()->translatedFormat('d F Y') }}</p>
+                    </div>
+                </div>
+            </div>
 
-                     <!-- ini filter bulanan--> 
-                    <div id="filter_bulan_group" class="filter-input-group flex items-center gap-2 {{ $filterType == 'bulanan' ? '' : 'hidden' }}">
+            <!-- AREA FILTER & SEARCH BAR -->
+            <div class="bg-slate-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl">
+                <form action="{{ route('dashboard') }}" method="GET" class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                    
+                    <div class="flex flex-wrap items-end gap-3 flex-1">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Bulan</label>
-                            <select name="bulan" class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                @for($m=1; $m<=12; $m++)
-                                    <option value="{{ sprintf('%02d', $m) }}" {{ request('bulan', date('m')) == sprintf('%02d', $m) ? 'selected' : '' }}>
-                                        {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
-                                    </option>
-                                @endfor
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tipe Filter</label>
+                            <select name="filter_type" id="filter_type" onchange="switchFilterView(this.value)" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                                <option value="semua" class="bg-slate-900" {{ $filterType == 'semua' ? 'selected' : '' }}>Semua Data</option>
+                                <option value="hari" class="bg-slate-900" {{ $filterType == 'hari' ? 'selected' : '' }}>Harian</option>
+                                <option value="minggu" class="bg-slate-900" {{ $filterType == 'minggu' ? 'selected' : '' }}>Mingguan</option>
+                                <option value="bulanan" class="bg-slate-900" {{ $filterType == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Tahun</label>
-                            <input type="number" name="tahun" value="{{ request('tahun', date('Y')) }}" class="border border-slate-300 rounded-lg px-3 py-2 text-sm w-24">
+
+                        <!-- Input Filter Harian -->
+                        <div id="filter_hari_group" class="filter-input-group {{ $filterType == 'hari' ? '' : 'hidden' }}">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Pilih Tanggal</label>
+                            <input type="date" name="tanggal" value="{{ request('tanggal', date('Y-m-d')) }}" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                        </div>
+
+                        <!-- Input Filter Mingguan -->
+                        <div id="filter_minggu_group" class="filter-input-group flex items-center gap-2 {{ $filterType == 'minggu' ? '' : 'hidden' }}">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Dari Tanggal</label>
+                                <input type="date" name="tgl_mulai" value="{{ request('tgl_mulai', now()->startOfWeek()->format('Y-m-d')) }}" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                            </div>
+                            <span class="text-xs text-slate-400 self-end mb-2.5">s/d</span>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Sampai Tanggal</label>
+                                <input type="date" name="tgl_selesai" value="{{ request('tgl_selesai', now()->endOfWeek()->format('Y-m-d')) }}" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Input Filter Bulanan -->
+                        <div id="filter_bulan_group" class="filter-input-group flex items-center gap-2 {{ $filterType == 'bulanan' ? '' : 'hidden' }}">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Bulan</label>
+                                <select name="bulan" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                                    @for($m=1; $m<=12; $m++)
+                                        <option value="{{ sprintf('%02d', $m) }}" class="bg-slate-900" {{ request('bulan', date('m')) == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                            {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tahun</label>
+                                <input type="number" name="tahun" value="{{ request('tahun', date('Y')) }}" class="bg-slate-800/90 border border-white/20 text-white rounded-xl px-3.5 py-2 text-sm w-24 focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Tombol Terapkan & Reset Filter -->
+                        <div class="flex items-center space-x-2">
+                            <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold border border-white/20 transition">
+                                <i class="fa-solid fa-magnifying-glass mr-1 text-cyan-400"></i> Filter
+                            </button>
+                            <a href="{{ route('dashboard') }}" class="bg-white/10 hover:bg-white/20 text-slate-300 px-3.5 py-2 rounded-xl text-sm font-semibold border border-white/10 transition">
+                                Reset
+                            </a>
                         </div>
                     </div>
 
-                    <!-- Tombol Terapkan & Reset Filter -->
-                    <div class="flex items-center space-x-2">
-                        <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                            <i class="fa-solid fa-magnifying-glass mr-1"></i> Filter
-                        </button>
-                        <a href="{{ route('dashboard') }}" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-sm font-semibold transition">
-                            Reset
-                        </a>
+                    <!-- Live Client Search Bar -->
+                    <div class="w-full lg:w-72">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Cari Tamu (Realtime)</label>
+                        <div class="relative">
+                            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari nama / instansi..." class="w-full bg-slate-800/90 border border-white/20 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                            <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Live Client Search Bar -->
-                <div class="w-full lg:w-72">
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Tamu (Realtime)</label>
-                    <div class="relative">
-                        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari nama / instansi..." class="w-full border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- TABEL DATA TAMU -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm" id="tamuTable">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-700 uppercase text-xs font-bold border-b border-slate-200">
-                            <th class="p-4 text-center w-12">NO</th>
-                            <th class="p-4">WAKTU DATANG</th>
-                            <th class="p-4 text-center">FOTO</th>
-                            <th class="p-4">NAMA TAMU</th>
-                            <th class="p-4">INSTANSI</th>
-                            <th class="p-4">NO. HP</th>
-                            <th class="p-4">KEPERLUAN</th>
-                            <th class="p-4 text-center w-36">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200">
-                        @forelse($tamus as $index => $tamu)
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 text-center font-medium text-slate-500">{{ $index + 1 }}</td>
-                            <td class="p-4 text-slate-600 text-xs font-medium">
-                                {{ $tamu->created_at ? $tamu->created_at->format('d/m/Y H:i') : '-' }} WIB
-                            </td>
-                            <td class="p-4 text-center">
-                                @if($tamu->foto_wajah)
-                                    <img src="{{ asset('storage/' . $tamu->foto_wajah) }}" onclick="openImageModal('{{ asset('storage/' . $tamu->foto_wajah) }}')" class="w-10 h-10 object-cover rounded-full mx-auto border-2 border-slate-200 cursor-pointer hover:opacity-80 transition" alt="Foto Tamu">
-                                @else
-                                    <div class="w-10 h-10 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center mx-auto text-xs">
-                                        <i class="fa-solid fa-user"></i>
-                                    </div>
-                                @endif
-                            </td>
-                            <td class="p-4 font-bold text-slate-900">{{ $tamu->nama }}</td>
-                            <td class="p-4 text-slate-700">{{ $tamu->instansi }}</td>
-                            <td class="p-4 text-slate-600">{{ $tamu->no_hp }}</td>
-                            <td class="p-4 text-slate-600 max-w-xs truncate">{{ $tamu->keperluan }}</td>
-                            <td class="p-4 text-center space-x-1">
-                                <!-- Button Detail -->
-                                <button onclick="openModal('modalDetail{{ $tamu->id }}')" class="p-2 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-lg text-xs font-semibold transition" title="Lihat Detail">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                                <!-- Button Edit -->
-                                <button onclick="openModal('modalEdit{{ $tamu->id }}')" class="p-2 bg-amber-100 text-amber-600 hover:bg-amber-200 rounded-lg text-xs font-semibold transition" title="Edit Data">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <!-- Button Hapus -->
-                                <form action="{{ route('tamu.destroy', $tamu->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data tamu ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg text-xs font-semibold transition" title="Hapus Data">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="p-8 text-center text-slate-400">
-                                <i class="fa-solid fa-folder-open text-4xl mb-2 block"></i>
-                                Tidak ada data kunjungan tamu ditemukan pada periode ini.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                </form>
             </div>
-        </div>
 
-    </main>
+            <!-- TABEL DATA TAMU -->
+            <div class="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm text-slate-200" id="tamuTable">
+                        <thead>
+                            <tr class="bg-white/10 text-white uppercase text-xs font-semibold border-b border-white/10">
+                                <th class="p-4 text-center w-12">NO</th>
+                                <th class="p-4">WAKTU DATANG</th>
+                                <th class="p-4 text-center">FOTO</th>
+                                <th class="p-4">NAMA TAMU</th>
+                                <th class="p-4">INSTANSI</th>
+                                <th class="p-4">NO. HP</th>
+                                <th class="p-4">KEPERLUAN</th>
+                                <th class="p-4 text-center w-36">AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/10">
+                            @forelse($tamus as $index => $tamu)
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="p-4 text-center font-medium text-slate-400">{{ $index + 1 }}</td>
+                                <td class="p-4 text-xs font-medium text-slate-300 whitespace-nowrap">
+                                    {{ $tamu->created_at ? $tamu->created_at->format('d/m/Y H:i') : '-' }} WIB
+                                </td>
+                                <td class="p-4 text-center">
+                                    @if($tamu->foto_wajah)
+                                        <img src="{{ asset('storage/' . $tamu->foto_wajah) }}" onclick="openImageModal('{{ asset('storage/' . $tamu->foto_wajah) }}')" class="w-10 h-10 object-cover rounded-full mx-auto border-2 border-cyan-400 shadow-md cursor-pointer hover:scale-110 transition" alt="Foto Tamu">
+                                    @else
+                                        <div class="w-10 h-10 bg-slate-800 text-slate-400 border border-white/10 rounded-full flex items-center justify-center mx-auto text-xs shadow-inner">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="p-4 font-bold text-white whitespace-nowrap">{{ $tamu->nama }}</td>
+                                <td class="p-4 text-slate-300 whitespace-nowrap">{{ $tamu->instansi }}</td>
+                                <td class="p-4 text-slate-300 whitespace-nowrap">{{ $tamu->no_hp }}</td>
+                                <td class="p-4 text-slate-300 max-w-xs truncate" title="{{ $tamu->keperluan }}">{{ $tamu->keperluan }}</td>
+                                <td class="p-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1.5">
+                                        <!-- Button Detail -->
+                                        <button onclick="openModal('modalDetail{{ $tamu->id }}')" class="p-2 bg-blue-500/20 text-cyan-300 hover:bg-blue-500/40 border border-blue-400/30 rounded-xl text-xs font-semibold transition" title="Lihat Detail">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <!-- Button Edit -->
+                                        <button onclick="openModal('modalEdit{{ $tamu->id }}')" class="p-2 bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 border border-amber-400/30 rounded-xl text-xs font-semibold transition" title="Edit Data">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <!-- Button Hapus -->
+                                        <form action="{{ route('tamu.destroy', $tamu->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data tamu ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-2 bg-red-500/20 text-red-300 hover:bg-red-500/40 border border-red-400/30 rounded-xl text-xs font-semibold transition" title="Hapus Data">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="p-8 text-center text-slate-400">
+                                    <i class="fa-solid fa-folder-open text-4xl mb-2 block text-slate-500"></i>
+                                    Tidak ada data kunjungan tamu ditemukan pada periode ini.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-   
-    <!-- ini untuk TAMBAH TAMU MANUAL (FILE UPLOAD & KAMERA LIVE) -->
-   
-    <div id="modalTambah" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-user-plus text-blue-600 mr-2"></i>Tambah Tamu Manual</h3>
-                <button onclick="closeModal('modalTambah')" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        </main>
+    </div>
+
+    <!-- ================= MODAL TAMBAH TAMU MANUAL ================= -->
+    <div id="modalTambah" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto text-white">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-cyan-400"></i> Tambah Tamu Manual
+                </h3>
+                <button onclick="closeModal('modalTambah')" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
             </div>
             
             <form action="{{ route('tamu.store') }}" method="POST">
@@ -260,135 +275,136 @@
                 <div class="space-y-4 text-sm">
                     <!-- Input Foto Wajah & Live Kamera -->
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Foto Tamu (Opsional)</label>
+                        <label class="block font-medium text-slate-300 mb-1.5">Foto Tamu (Opsional)</label>
                         
-                        <!-- Tombol Opsi: Choose File & Buka Kamera -->
                         <div class="flex items-center gap-2 mb-2">
-                            <input type="file" id="foto_file" accept="image/*" onchange="convertImageToBase64(this)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded-lg p-1">
-                            <button type="button" onclick="startCamera()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1 shadow-sm">
+                            <input type="file" id="foto_file" accept="image/*" onchange="convertImageToBase64(this)" class="w-full text-xs text-slate-300 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600/30 file:text-cyan-300 hover:file:bg-blue-600/50 bg-slate-800/80 border border-white/20 rounded-xl p-1">
+                            <button type="button" onclick="startCamera()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 transition whitespace-nowrap flex items-center gap-1.5 shadow-md">
                                 <i class="fa-solid fa-camera"></i> Kamera
                             </button>
                         </div>
 
                         <!-- Stream Kamera Live -->
-                        <div id="webcam_container" class="hidden mb-3 text-center bg-slate-900 rounded-xl p-2 relative shadow-inner">
-                            <video id="webcam_video" autoplay playsinline class="w-full h-48 object-cover rounded-lg border border-slate-700"></video>
-                            <div class="mt-2 flex justify-center gap-2">
-                                <button type="button" onclick="takeSnapshot()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center gap-1">
-                                    <i class="fa-solid fa-circle-dot"></i> Jepret Foto
+                        <div id="webcam_container" class="hidden mb-3 text-center bg-slate-950 rounded-xl p-2 border border-white/20 shadow-inner">
+                            <video id="webcam_video" autoplay playsinline class="w-full h-48 object-cover rounded-lg border border-slate-800"></video>
+                            <div class="mt-2.5 flex justify-center gap-2">
+                                <button type="button" onclick="takeSnapshot()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-white/20 shadow flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-dot text-cyan-300"></i> Jepret Foto
                                 </button>
-                                <button type="button" onclick="stopCamera()" class="bg-slate-700 hover:bg-slate-800 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg">
+                                <button type="button" onclick="stopCamera()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/10">
                                     Batal
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Canvas untuk Capture Foto -->
                         <canvas id="webcam_canvas" class="hidden"></canvas>
 
                         <!-- Preview Hasil Foto -->
                         <div id="preview_container" class="mt-2 hidden text-center">
-                            <img id="foto_preview" src="" class="w-24 h-24 object-cover rounded-xl border mx-auto shadow-sm">
-                            <button type="button" onclick="removePhoto()" class="text-xs text-red-600 hover:underline mt-1 inline-block font-medium">Hapus Foto</button>
+                            <img id="foto_preview" src="" class="w-24 h-24 object-cover rounded-xl border border-cyan-400 mx-auto shadow-lg">
+                            <button type="button" onclick="removePhoto()" class="text-xs text-red-400 hover:underline mt-1.5 inline-block font-medium">Hapus Foto</button>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
-                        <input type="text" name="nama" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500">
+                        <label class="block font-medium text-slate-300 mb-1">Nama Lengkap *</label>
+                        <input type="text" name="nama" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Instansi / Perusahaan *</label>
-                        <input type="text" name="instansi" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500">
+                        <label class="block font-medium text-slate-300 mb-1">Instansi / Perusahaan *</label>
+                        <input type="text" name="instansi" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP *</label>
-                        <input type="text" name="no_hp" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500">
+                        <label class="block font-medium text-slate-300 mb-1">Nomor WhatsApp / HP *</label>
+                        <input type="text" name="no_hp" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Keperluan Kunjungan *</label>
-                        <textarea name="keperluan" rows="3" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500"></textarea>
+                        <label class="block font-medium text-slate-300 mb-1">Keperluan Kunjungan *</label>
+                        <textarea name="keperluan" rows="3" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none"></textarea>
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('modalTambah')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm hover:bg-slate-300">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700">Simpan Data</button>
+                <div class="mt-6 flex justify-end space-x-3 border-t border-white/10 pt-4">
+                    <button type="button" onclick="closeModal('modalTambah')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-sm border border-white/10">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-sm border border-white/20 shadow-lg">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 
-    
-    <!-- ini untuk DETAIL & EDIT TAMU (LOOPING)  -->
-   
+    <!-- ================= MODAL DETAIL & EDIT (LOOPING) ================= -->
     @foreach($tamus as $tamu)
         <!-- MODAL DETAIL -->
-        <div id="modalDetail{{ $tamu->id }}" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-                <div class="flex justify-between items-center mb-4 border-b pb-3">
-                    <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-address-card text-blue-600 mr-2"></i>Detail Kunjungan</h3>
-                    <button onclick="closeModal('modalDetail{{ $tamu->id }}')" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        <div id="modalDetail{{ $tamu->id }}" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-slate-900 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-white">
+                <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-address-card text-cyan-400"></i> Detail Kunjungan
+                    </h3>
+                    <button onclick="closeModal('modalDetail{{ $tamu->id }}')" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
                 </div>
-                <div class="space-y-3 text-sm">
+                <div class="space-y-3.5 text-sm">
                     @if($tamu->foto_wajah)
                         <div class="text-center mb-3">
-                            <img src="{{ asset('storage/' . $tamu->foto_wajah) }}" class="w-24 h-24 object-cover rounded-xl border mx-auto shadow-sm">
+                            <img src="{{ asset('storage/' . $tamu->foto_wajah) }}" class="w-24 h-24 object-cover rounded-2xl border-2 border-cyan-400 mx-auto shadow-lg">
                         </div>
                     @endif
-                    <div><span class="text-slate-400 block text-xs">Waktu Kedatangan:</span> <strong>{{ $tamu->created_at ? $tamu->created_at->format('d F Y - H:i') : '-' }} WIB</strong></div>
-                    <div><span class="text-slate-400 block text-xs">Nama Tamu:</span> <strong>{{ $tamu->nama }}</strong></div>
-                    <div><span class="text-slate-400 block text-xs">Instansi:</span> <strong>{{ $tamu->instansi }}</strong></div>
-                    <div><span class="text-slate-400 block text-xs">No. HP:</span> <strong>{{ $tamu->no_hp }}</strong></div>
-                    <div><span class="text-slate-400 block text-xs">Keperluan:</span> <p class="bg-slate-50 p-3 rounded-lg border text-slate-700 mt-1">{{ $tamu->keperluan }}</p></div>
+                    <div><span class="text-slate-400 block text-xs mb-0.5">Waktu Kedatangan:</span> <strong class="text-white">{{ $tamu->created_at ? $tamu->created_at->format('d F Y - H:i') : '-' }} WIB</strong></div>
+                    <div><span class="text-slate-400 block text-xs mb-0.5">Nama Tamu:</span> <strong class="text-white">{{ $tamu->nama }}</strong></div>
+                    <div><span class="text-slate-400 block text-xs mb-0.5">Instansi:</span> <strong class="text-white">{{ $tamu->instansi }}</strong></div>
+                    <div><span class="text-slate-400 block text-xs mb-0.5">No. HP:</span> <strong class="text-white">{{ $tamu->no_hp }}</strong></div>
+                    <div><span class="text-slate-400 block text-xs mb-0.5">Keperluan:</span> <p class="bg-white/5 p-3 rounded-xl border border-white/10 text-slate-200 mt-1 leading-relaxed">{{ $tamu->keperluan }}</p></div>
                 </div>
-                <div class="mt-6 text-right">
-                    <button onclick="closeModal('modalDetail{{ $tamu->id }}')" class="px-4 py-2 bg-slate-800 text-white rounded-lg font-semibold text-sm">Tutup</button>
+                <div class="mt-6 text-right border-t border-white/10 pt-4">
+                    <button onclick="closeModal('modalDetail{{ $tamu->id }}')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold text-sm border border-white/10">Tutup</button>
                 </div>
             </div>
         </div>
 
         <!-- MODAL EDIT -->
-        <div id="modalEdit{{ $tamu->id }}" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-                <div class="flex justify-between items-center mb-4 border-b pb-3">
-                    <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-pen-to-square text-amber-600 mr-2"></i>Edit Data Tamu</h3>
-                    <button onclick="closeModal('modalEdit{{ $tamu->id }}')" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+        <div id="modalEdit{{ $tamu->id }}" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-slate-900 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-white">
+                <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Data Tamu
+                    </h3>
+                    <button onclick="closeModal('modalEdit{{ $tamu->id }}')" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
                 </div>
                 <form action="{{ route('tamu.update', $tamu->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="space-y-4 text-sm">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
-                            <input type="text" name="nama" value="{{ $tamu->nama }}" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500">
+                            <label class="block font-medium text-slate-300 mb-1">Nama Lengkap *</label>
+                            <input type="text" name="nama" value="{{ $tamu->nama }}" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Instansi / Perusahaan *</label>
-                            <input type="text" name="instansi" value="{{ $tamu->instansi }}" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500">
+                            <label class="block font-medium text-slate-300 mb-1">Instansi / Perusahaan *</label>
+                            <input type="text" name="instansi" value="{{ $tamu->instansi }}" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP *</label>
-                            <input type="text" name="no_hp" value="{{ $tamu->no_hp }}" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500">
+                            <label class="block font-medium text-slate-300 mb-1">Nomor WhatsApp / HP *</label>
+                            <input type="text" name="no_hp" value="{{ $tamu->no_hp }}" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Keperluan Kunjungan *</label>
-                            <textarea name="keperluan" rows="3" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500">{{ $tamu->keperluan }}</textarea>
+                            <label class="block font-medium text-slate-300 mb-1">Keperluan Kunjungan *</label>
+                            <textarea name="keperluan" rows="3" required class="w-full bg-slate-800/80 border border-white/20 rounded-xl p-2.5 text-white focus:ring-2 focus:ring-amber-400 focus:outline-none">{{ $tamu->keperluan }}</textarea>
                         </div>
                     </div>
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="closeModal('modalEdit{{ $tamu->id }}')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-semibold text-sm hover:bg-slate-300">Batal</button>
-                        <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg font-semibold text-sm hover:bg-amber-700">Simpan Perubahan</button>
+                    <div class="mt-6 flex justify-end space-x-3 border-t border-white/10 pt-4">
+                        <button type="button" onclick="closeModal('modalEdit{{ $tamu->id }}')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-sm border border-white/10">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-semibold text-sm border border-white/20 shadow-lg">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
         </div>
     @endforeach
 
-    <!-- MODAL ZOOM PREVIEW FOTO -->
-    <div id="modalFoto" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50" onclick="closeModal('modalFoto')">
-        <div class="max-w-lg w-full p-2 relative">
-            <img id="imgZoom" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl border-2 border-white">
+    <!-- MODAL ZOOM PREVIEW FOTO FULLSIZE -->
+    <div id="modalFoto" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50" onclick="closeModal('modalFoto')">
+        <div class="max-w-lg w-full p-2 relative text-center">
+            <img id="imgZoom" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl border-2 border-cyan-400 mx-auto">
+            <p class="text-xs text-slate-400 mt-2 font-medium">Klik di mana saja untuk menutup</p>
         </div>
     </div>
 
