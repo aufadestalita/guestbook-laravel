@@ -3,20 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\GuestBook; // Ganti dengan nama Model lu kalau berbeda (misal Tamu)
+use App\Models\GuestBook; 
+use Cloudinary\Cloudinary; // 1. Import SDK Cloudinary
 
 class GuestBookController extends Controller
 {
-    // 1. Fungsi index() yang kehapus kita balikin lagi di sini
+    // 1. Fungsi index() untuk menampilkan form buku tamu
     public function index()
     {
-        // Ganti 'bukutamu' di bawah ini dengan nama file blade form lu 
-        // (Misal nama filenya 'isi-buku-tamu.blade.php', berarti tulis 'isi-buku-tamu')
         return view('buku_tamu'); 
     }
 
-    // 2. Fungsi store() untuk memproses webcam dan simpan ke database
+    // 2. Fungsi store() untuk memproses webcam & simpan ke Cloudinary + DB
     public function store(Request $request)
     {
         $request->validate([
@@ -28,26 +26,33 @@ class GuestBookController extends Controller
 
         $pathFoto = null;
 
+        // Jika ada string foto dari webcam
         if ($request->foto_wajah) {
-            $image = $request->foto_wajah; 
-            
-            $image = str_replace('data:image/png;base64,', '', $image);
-            $image = str_replace('data:image/jpeg;base64,', '', $image);
-            $image = str_replace(' ', '+', $image);
-            
-            $imageName = 'foto_' . time() . '_' . uniqid() . '.png';
-            
-            Storage::disk('public')->put('foto_tamu/' . $imageName, base64_decode($image));
-            
-            $pathFoto = 'foto_tamu/' . $imageName;
+            $cloudinary = new Cloudinary();
+
+            $imageData = $request->foto_wajah;
+
+            // Pastikan formatnya sudah berawalan Data URI (data:image/png;base64,...)
+            if (!str_starts_with($imageData, 'data:image')) {
+                $imageData = 'data:image/png;base64,' . $imageData;
+            }
+
+            // Upload langsung string Base64 webcam ke Cloudinary
+            $upload = $cloudinary->uploadApi()->upload($imageData, [
+                'folder' => 'guestbook_photos' // Folder simpan di Cloudinary
+            ]);
+
+            // Ambil URL HTTPS permanen dari Cloudinary
+            $pathFoto = $upload['secure_url'];
         }
 
+        // Simpan data tamu & URL gambar Cloudinary ke Database MySQL
         GuestBook::create([
             'nama'       => $request->nama,       
             'instansi'   => $request->instansi,
             'no_hp'      => $request->no_hp,
             'keperluan'  => $request->keperluan,
-            'foto_wajah' => $pathFoto, 
+            'foto_wajah' => $pathFoto, // Sekarang berisi URL: https://res.cloudinary.com/...
         ]);
 
         return redirect()->back()->with('success', 'Data kunjungan tamu berhasil disimpan!');

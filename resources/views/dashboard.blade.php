@@ -207,9 +207,10 @@
                                     {{ $tamu->created_at ? $tamu->created_at->format('d/m/Y H:i') : '-' }} WIB
                                 </td>
                                 <td class="p-4 text-center">
+                                   
                                     @if($tamu->foto_wajah)
-                                        <img src="{{ asset('storage/' . $tamu->foto_wajah) }}" onclick="openImageModal('{{ asset('storage/' . $tamu->foto_wajah) }}')" class="w-10 h-10 object-cover rounded-full mx-auto border-2 border-cyan-400 shadow-md cursor-pointer hover:scale-110 transition" alt="Foto Tamu">
-                                    @else
+                                                 <img src="{{ $tamu->foto_wajah }}" onclick="openImageModal('{{ $tamu->foto_wajah }}')" class="w-10 h-10 object-cover rounded-full mx-auto border-2 border-cyan-400 shadow-md cursor-pointer hover:scale-110 transition" alt="Foto Tamu">
+                                            @else
                                         <div class="w-10 h-10 bg-slate-800 text-slate-400 border border-white/10 rounded-full flex items-center justify-center mx-auto text-xs shadow-inner">
                                             <i class="fa-solid fa-user"></i>
                                         </div>
