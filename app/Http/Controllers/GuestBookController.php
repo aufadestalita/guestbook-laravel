@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\GuestBook; 
-use Cloudinary\Cloudinary; // 1. Import SDK Cloudinary
+use Cloudinary\Cloudinary;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class GuestBookController extends Controller
 {
@@ -32,14 +34,14 @@ class GuestBookController extends Controller
 
             $imageData = $request->foto_wajah;
 
-            // Pastikan formatnya sudah berawalan Data URI (data:image/png;base64,...)
+            // Pastikan formatnya sudah berawalan Data URI
             if (!str_starts_with($imageData, 'data:image')) {
                 $imageData = 'data:image/png;base64,' . $imageData;
             }
 
             // Upload langsung string Base64 webcam ke Cloudinary
             $upload = $cloudinary->uploadApi()->upload($imageData, [
-                'folder' => 'guestbook_photos' // Folder simpan di Cloudinary
+                'folder' => 'guestbook_photos'
             ]);
 
             // Ambil URL HTTPS permanen dari Cloudinary
@@ -52,9 +54,26 @@ class GuestBookController extends Controller
             'instansi'   => $request->instansi,
             'no_hp'      => $request->no_hp,
             'keperluan'  => $request->keperluan,
-            'foto_wajah' => $pathFoto, // Sekarang berisi URL: https://res.cloudinary.com/...
+            'foto_wajah' => $pathFoto,
         ]);
 
         return redirect()->back()->with('success', 'Data kunjungan tamu berhasil disimpan!');
+    }
+
+    // 3. Fungsi exportPdf() untuk cetak rekap PDF
+    public function exportPdf(Request $request)
+    {
+        Carbon::setLocale('id');
+
+        $tamus = GuestBook::latest()->get();
+        $totalTamu = $tamus->count();
+        $periodeText = 'Semua Periode';
+
+        // Sesuaikan nama folder/file view template PDF kamu di sini 
+        // (contoh jika nama filenya: resources/views/rekap_pdf.blade.php)
+        $pdf = Pdf::loadView('rekap_pdf', compact('tamus', 'totalTamu', 'periodeText'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Rekap-Buku-Tamu-KSOP-' . date('Y-m-d') . '.pdf');
     }
 }
